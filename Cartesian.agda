@@ -53,7 +53,7 @@ ContFrac = List ℕ
 ℚ = ℕ x ℕ
 
 inits : List ℕ ->  List (List ℕ)
-inits []       = [] :: []
+inits [] = [] :: []
 inits (x :: xs) = [] :: mapList (x ::_) (inits xs)
 
 _⊚_ : {A B C : Set} → (B → Maybe C) → (A → Maybe B) → A → Maybe C
