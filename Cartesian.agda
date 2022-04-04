@@ -35,6 +35,9 @@ mapList : {A B : Set} -> (A -> B) -> List A -> List B
 mapList f [] = []
 mapList f (x :: xs) = f x :: mapList f xs
 
+{-
+Instead of
+
 data _x_ (A B : Set) : Set where
   <_,_> : A -> B -> A x B
 
@@ -43,6 +46,16 @@ fst < a , b >  = a
 
 snd : {A B : Set} -> A x B -> B
 snd < a , b > = b
+
+use a record like this:
+-}
+
+record _x_ (A B : Set) : Set where
+  constructor <_,_>
+  field
+    fst : A
+    snd : B
+
 
 -- The basic stuff is finished. Now the ApproxRatio.agda stuff.
 
