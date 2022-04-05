@@ -1,4 +1,5 @@
-open import Data.Maybe renaming (map to mapMb)
+open import Data.Maybe renaming (map to mapMb) hiding (zip)
+open import Relation.Binary.PropositionalEquality
 open import Function.Base
 open import Data.Unit
 open import Data.Maybe.Categorical
@@ -69,7 +70,7 @@ convergents : ContFrac → List ℚ
 convergents = (mapList toℚ) ∘ inits
 
 -- Implementation of the recursion prop 1.14
-
+{-
 toQ : ContFrac -> ℚ
 toQ [] = < succ zero , zero >
 toQ (a :: as)=
@@ -80,3 +81,24 @@ toQ (a :: as)=
 
 convergents' : ContFrac -> List ℚ
 convergents' = (mapList toQ) ∘ inits
+-}
+
+
+-- zip works like a zipper, e.g.
+-- zip [1,2,3] [a,b] = [< 1 , a > , < 2 , b >]
+-- the length of the result is the length of the
+-- shorter input list
+zip : {A B : Set} → List A → List B → List (A x B)
+zip [] bs = {!!}
+zip (a :: as) [] = {!!}
+zip (a :: as) (b :: bs) = {!!}
+
+numerators denominators : ContFrac → List ℕ 
+numerators cf = {!!}
+denominators cf = {!!}
+
+convergents' : ContFrac → List ℚ
+convergents' cf = zip (numerators cf) (denominators cf)
+
+proof : (cf : ContFrac) → convergents cf ≡ convergents' cf
+proof = {!!}
