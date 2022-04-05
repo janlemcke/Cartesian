@@ -35,21 +35,6 @@ mapList : {A B : Set} -> (A -> B) -> List A -> List B
 mapList f [] = []
 mapList f (x :: xs) = f x :: mapList f xs
 
-{-
-Instead of
-
-data _x_ (A B : Set) : Set where
-  <_,_> : A -> B -> A x B
-
-fst : {A B : Set} -> A x B -> A
-fst < a , b >  = a
-
-snd : {A B : Set} -> A x B -> B
-snd < a , b > = b
-
-use a record like this:
--}
-
 record _x_ (A B : Set) : Set where
   constructor <_,_>
   field
@@ -82,3 +67,16 @@ toℚ (a₀ :: as) =
 
 convergents : ContFrac → List ℚ
 convergents = (mapList toℚ) ∘ inits
+
+-- Implementation of the recursion prop 1.14
+
+toQ : ContFrac -> ℚ
+toQ [] = < succ zero , zero >
+toQ (a :: as)=
+  let
+    < p' , q' > = toQ as
+  in
+    < (a * p1) + p2 , (a * q1) + q2 >
+
+convergents' : ContFrac -> List ℚ
+convergents' = (mapList toQ) ∘ inits
