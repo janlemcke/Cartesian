@@ -11,6 +11,8 @@ data ℕ : Set where
   zero : ℕ
   succ : ℕ -> ℕ
 
+{-# BUILTIN NATURAL ℕ #-}
+
 pred : ℕ -> ℕ
 pred zero = zero
 pred (succ n) = n
@@ -21,13 +23,14 @@ succ m + n = succ (m + n)
 
 _*_ : ℕ -> ℕ -> ℕ
 zero * m = zero
-succ n * m = succ (n * m) + m
+succ n * m = (n * m) + m
 
 _<_ : ℕ → ℕ → Bool
 _ < zero  = false
 zero < succ _ = true
 succ n < succ m = n < m
 
+infixr 20 _::_
 data List (A : Set) : Set where
   [] : List A
   _::_ : A -> List A -> List A
@@ -89,16 +92,26 @@ convergents' = (mapList toQ) ∘ inits
 -- the length of the result is the length of the
 -- shorter input list
 zip : {A B : Set} → List A → List B → List (A x B)
-zip [] bs = {!!}
-zip (a :: as) [] = {!!}
-zip (a :: as) (b :: bs) = {!!}
+zip [] bs = []
+zip (a :: as) [] = []
+zip (a :: as) (b :: bs) = < a , b > :: zip as bs
 
-numerators denominators : ContFrac → List ℕ 
-numerators cf = {!!}
-denominators cf = {!!}
+scan2l : {A B : Set} ->  B -> B -> (B -> B -> A -> B) -> List A -> List B
+scan2l bn-2 bn-1 f [] = []
+scan2l bn-2 bn-1 f (a :: as) = f bn-2 bn-1 a :: scan2l bn-1 (f bn-2 bn-1 a) f as
+
+numerators denominators : ContFrac → List ℕ
+-- 0 1 startbedingung für p
+-- 1 0 startbedingungen für q, wobei n-2 das erste argument ist
+numerators cf = scan2l 0 1 (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) cf
+denominators cf = scan2l 1 0 (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) cf
 
 convergents' : ContFrac → List ℚ
 convergents' cf = zip (numerators cf) (denominators cf)
 
-proof : (cf : ContFrac) → convergents cf ≡ convergents' cf
+tail : {A : Set} -> List A -> List A
+tail [] = []
+tail (x :: xs) = xs
+
+proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof = {!!}
