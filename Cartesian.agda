@@ -1,8 +1,12 @@
+module Cartesian where
+
 open import Data.Maybe renaming (map to mapMb) hiding (zip)
 open import Relation.Binary.PropositionalEquality
 open import Function.Base
 open import Data.Unit
 open import Data.Maybe.Categorical
+open ≡-Reasoning
+
 
 data Bool : Set where
   false true : Bool
@@ -113,5 +117,32 @@ tail : {A : Set} -> List A -> List A
 tail [] = []
 tail (x :: xs) = xs
 
+x+0≡x : (x : ℕ) → x + 0 ≡ x
+x+0≡x zero = refl
+x+0≡x (succ x) = cong succ (x+0≡x x)
+
+
 proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
-proof = {!!}
+proof [] = refl
+proof (a :: as) =
+  let
+    < p' , q' > = toℚ as
+    innerf = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
+  in
+    tail (convergents (a :: as))
+      ≡⟨ refl ⟩
+    mapList toℚ (mapList (a ::_) (inits as))
+      ≡⟨ {!!} ⟩
+    zip (a :: scan2l 1 a innerf as) (scan2l 1 0 innerf (a :: as))  
+      ≡⟨ cong (λ x →  zip (x :: scan2l 1 x innerf as) (scan2l 1 0 innerf (a :: as)))
+         (sym (x+0≡x a)) ⟩
+    zip (((1 * a) + 0) :: scan2l 1 ((1 * a) + 0) innerf as) (scan2l 1 0 innerf (a :: as))  
+      ≡⟨ refl ⟩
+    zip (scan2l 0 1 innerf (a :: as)) (scan2l 1 0 innerf (a :: as))
+      ≡⟨ refl ⟩
+    zip (numerators (a :: as)) (denominators (a :: as))
+      ≡⟨ refl ⟩
+    convergents' (a :: as)
+      ∎
+
+
