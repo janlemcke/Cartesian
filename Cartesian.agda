@@ -76,20 +76,6 @@ toℚ (a₀ :: as) =
 convergents : ContFrac → List ℚ
 convergents = (mapList toℚ) ∘ inits
 
--- Implementation of the recursion prop 1.14
-{-
-toQ : ContFrac -> ℚ
-toQ [] = < succ zero , zero >
-toQ (a :: as)=
-  let
-    < p' , q' > = toQ as
-  in
-    < (a * p1) + p2 , (a * q1) + q2 >
-
-convergents' : ContFrac -> List ℚ
-convergents' = (mapList toQ) ∘ inits
--}
-
 
 -- zip works like a zipper, e.g.
 -- zip [1,2,3] [a,b] = [< 1 , a > , < 2 , b >]
