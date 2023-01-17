@@ -125,23 +125,24 @@ x+0≡x (succ x) = cong succ (x+0≡x x)
 proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
-  let
-    < p' , q' > = toℚ as
-    f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
-  in
-    tail (convergents (a :: as))
+    let
+      < p' , q' > = toℚ as  
+      f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
+    in
+      tail (convergents (a :: as))
       ≡⟨ refl ⟩
-    mapList toℚ (mapList (a ::_) (inits as))
-      ≡⟨ {!!} ⟩
-    zip (a :: scan2l 1 a f as) (scan2l 1 0 f (a :: as))  
-      ≡⟨ cong (λ x →  zip (x :: scan2l 1 x f as) (scan2l 1 0 f (a :: as)))
-         (sym (x+0≡x a)) ⟩
-    zip (((1 * a) + 0) :: scan2l 1 ((1 * a) + 0) f as) (scan2l 1 0 f (a :: as))  
+      mapList toℚ (mapList (a ::_) (inits as))
+      ≡⟨ cong (λ xs → mapList toℚ (mapList (a ::_) xs)) (inits as) ⟩
+      mapList (λ xs → toℚ (a :: xs)) (inits as)
+      ≡⟨ cong (λ xs → mapList (λ xs → < ((a * p') + q') , p' >) xs) (inits as) ⟩
+      mapList (λ xs → < ((a * p') + q') , p' >) (inits as)
+      ≡⟨ cong (λ xs → zip (mapList (λ xs → ((a * p') + q')) xs) (mapList (λ xs → p') xs)) (inits as) ⟩
+      zip (mapList (λ xs → ((a * p') + q')) (inits as)) (mapList (λ xs → p') (inits as))
+      ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
+      zip (scan2l 1 ((a * p') + q') f as) (scan2l 1 p' f as)
+       ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
+      zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
       ≡⟨ refl ⟩
-    zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
-      ≡⟨ refl ⟩
-    zip (numerators (a :: as)) (denominators (a :: as))
-      ≡⟨ refl ⟩
-    convergents' (a :: as)
+      convergents' (a :: as)
 
 
