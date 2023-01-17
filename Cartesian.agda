@@ -127,22 +127,21 @@ proof [] = refl
 proof (a :: as) =
   let
     < p' , q' > = toℚ as
-    innerf = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
+    f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
   in
     tail (convergents (a :: as))
       ≡⟨ refl ⟩
     mapList toℚ (mapList (a ::_) (inits as))
       ≡⟨ {!!} ⟩
-    zip (a :: scan2l 1 a innerf as) (scan2l 1 0 innerf (a :: as))  
-      ≡⟨ cong (λ x →  zip (x :: scan2l 1 x innerf as) (scan2l 1 0 innerf (a :: as)))
+    zip (a :: scan2l 1 a f as) (scan2l 1 0 f (a :: as))  
+      ≡⟨ cong (λ x →  zip (x :: scan2l 1 x f as) (scan2l 1 0 f (a :: as)))
          (sym (x+0≡x a)) ⟩
-    zip (((1 * a) + 0) :: scan2l 1 ((1 * a) + 0) innerf as) (scan2l 1 0 innerf (a :: as))  
+    zip (((1 * a) + 0) :: scan2l 1 ((1 * a) + 0) f as) (scan2l 1 0 f (a :: as))  
       ≡⟨ refl ⟩
-    zip (scan2l 0 1 innerf (a :: as)) (scan2l 1 0 innerf (a :: as))
+    zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
       ≡⟨ refl ⟩
     zip (numerators (a :: as)) (denominators (a :: as))
       ≡⟨ refl ⟩
     convergents' (a :: as)
-      ∎
 
 
