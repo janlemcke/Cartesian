@@ -186,39 +186,10 @@ convergents' (1 :: 2 :: 3 :: []) == < 1 , 1 > :: < 3 , 2 > :: < 10 , 7 > :: []
 
 We see that we roughly get the exact same result, but the result of convergents has one tuple to much as a head. That's why we need to show that the tail of the result is the same as the result of convergents'.
 
-## Proof that tail(convergents cf) == convergents'cf
-
-proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
-proof [] = refl
-proof (a :: as) =
-    let
-      < p' , q' > = toℚ as  
-      f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
-    in
-      tail (convergents (a :: as))
-      ≡⟨ refl ⟩
-      mapList toℚ (mapList (a ::_) (inits as))
-      ≡⟨ cong (λ xs → mapList toℚ (mapList (a ::_) xs)) (inits as) ⟩
-      mapList (λ xs → toℚ (a :: xs)) (inits as)
-      ≡⟨ cong (λ xs → mapList (λ xs → < ((a * p') + q') , p' >) xs) (inits as) ⟩
-      mapList (λ xs → < ((a * p') + q') , p' >) (inits as)
-      ≡⟨ cong (λ xs → zip (mapList (λ xs → ((a * p') + q')) xs) (mapList (λ xs → p') xs)) (inits as) ⟩
-      zip (mapList (λ xs → ((a * p') + q')) (inits as)) (mapList (λ xs → p') (inits as))
-      ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
-      zip (scan2l 1 ((a * p') + q') f as) (scan2l 1 p' f as)
-       ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
-      zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
-      ≡⟨ refl ⟩
-      convergents' (a :: as)
-
-
-
-
 -----------------
 
+## Proof that tail(convergents cf) == convergents'cf
 ```
-proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
-proof [] = refl
 proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
