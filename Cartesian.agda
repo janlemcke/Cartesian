@@ -180,3 +180,23 @@ initsExmpl =
        {- Def. mapList (1 ::_), 1st pattern -} ⟩
   [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
     ∎
+
+-- towards computing toℚ [1,2,3]
+
+toℚLemma0 : toℚ [] ≡ < 1 , 0 >
+toℚLemma0 = {!!}
+
+toℚLemma1 : (a₀ : ℕ) → toℚ ( a₀ :: []) ≡ < a₀ , 1 >
+toℚLemma1 a₀ =
+  toℚ (a₀ :: [])
+   ≡⟨ refl {- Def toℚ, 2md pattern -} ⟩
+  let < p' , q' > = toℚ [] in
+  < ((a₀ * p') + q') , p' >
+   ≡⟨ cong (λ x → let < p' , q' > = x in < ((a₀ * p') + q') , p' > )  toℚLemma0 ⟩
+  let < p' , q' > = < 1 , 0 > in
+  < ((a₀ * p') + q') , p' >
+   ≡⟨ refl {- Def. let ... -} ⟩
+  < ((a₀ * 1) + 0) , 1 >
+   ≡⟨ {!!} ⟩
+  < a₀ , 1 >
+   ∎
