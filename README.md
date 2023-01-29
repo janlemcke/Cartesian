@@ -8,9 +8,9 @@ ContFrac = List ℕ
 ℚ = ℕ x ℕ
 ```
 
-ContFrac is defined to be a synonym for List ℕ, which means that it is a type consisting of a list of natural numbers.
+ContFrac is defined to be a synonym for List ℕ, which means that it is a type consisting of lists of natural numbers.
 
-ℚ is defined to be the Cartesian product of ℕ and ℕ, using the record type x defined earlier. This means that it is a type that consists of a pair of natural numbers, with the first component being accessed via the field `fst` and the second component being accessed via the field `snd` .
+ℚ is defined to be the Cartesian product of ℕ and ℕ, using the record type x defined earlier. This means that it is a type that consists of pairs of natural numbers, with the first component being accessed via the field `fst` and the second component being accessed via the field `snd` .
 
 
 ```
@@ -31,13 +31,15 @@ inits [1,2,3]
 # output from agda console
 = [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
 ```
-
+(Tim 29.01.: this derivation is incorrect, see email...)
 
 ```
 _⊚_ : {A B C : Set} → (B → Maybe C) → (A → Maybe B) → A → Maybe C
 f ⊚ g = λ x → g x >>= f
 ```
 This operator composes two functions, f and g, such that the output of g is passed as the input to f.
+(Tim 29.01. well, _∘_ composes functions... , _⊚_ does a bit more: the output type of g is
+   Maybe B, but the input type of f is B )
 
 ```
 toℚ : ContFrac → ℚ
@@ -67,6 +69,8 @@ toQ (1 :: 2 :: 3 :: []) != < 10 , 7>
 
 ```
 10/7 = 1.42857142857
+(Tim 29.01. this derivation is also formally incorrect - although it is somehow
+  "clear what you mean".) 
 
 ## Convergents
 The first proposal to calculate the convergents is the following:
@@ -101,7 +105,7 @@ scan2l bn-2 bn-1 f [] = []
 scan2l bn-2 bn-1 f (a :: as) = f bn-2 bn-1 a :: scan2l bn-1 (f bn-2 bn-1 a) f as
 ```
 
-`scan2l` is a function that takes in 5 arguments: two initial values (bn-2 and bn-1) of type B, a binary function (f) that takes in two values of type B and one value of type A, and returns a value of type B, and a list of values of type A ([]). The function returns a list of values of type B.
+`scan2l` is a function that takes in 5 arguments: two initial values (bn-2 and bn-1) of type B, a 3-ary function (f) that takes in two values of type B and one value of type A, and returns a value of type B, and a list of values of type A. The function returns a list of values of type B.
 
 The function starts by defining the base case, where if the input list is empty, it returns an empty list. Otherwise, it applies the binary function f to the initial values bn-2 and bn-1 and the first value in the input list (a). This result is consed onto the recursive call of the function, where bn-1 becomes the new bn-2 and the result of f becomes the new bn-1. The result is a list of values of type B.
 
@@ -194,7 +198,7 @@ proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
     let
-      < p' , q' > = toℚ as  
+      < p' , q' > = toℚ as
       f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
     in
       tail (convergents (a :: as))
@@ -212,5 +216,4 @@ proof (a :: as) =
       zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
       ≡⟨ refl ⟩
       convergents' (a :: as)
-      
 ```

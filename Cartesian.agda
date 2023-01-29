@@ -112,23 +112,71 @@ proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
     let
-      < p' , q' > = toℚ as  
-      f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 )
+      < p' , q' > = toℚ as
+      f = (λ bn-2 → λ bn-1 → λ a → (bn-1 * a) + bn-2 )
     in
       tail (convergents (a :: as))
-      ≡⟨ refl ⟩
+       ≡⟨ refl ⟩
       mapList toℚ (mapList (a ::_) (inits as))
-      ≡⟨ cong (λ xs → mapList toℚ (mapList (a ::_) xs)) (inits as) ⟩
+       ≡⟨ {!!} {- cong (λ xs → mapList toℚ (mapList (a ::_) xs)) (inits as) -} ⟩
       mapList (λ xs → toℚ (a :: xs)) (inits as)
-      ≡⟨ cong (λ xs → mapList (λ xs → < ((a * p') + q') , p' >) xs) (inits as) ⟩
+       ≡⟨ {!!} {- cong (λ xs → mapList (λ xs → < ((a * p') + q') , p' >) xs) (inits as) -} ⟩
       mapList (λ xs → < ((a * p') + q') , p' >) (inits as)
-      ≡⟨ cong (λ xs → zip (mapList (λ xs → ((a * p') + q')) xs) (mapList (λ xs → p') xs)) (inits as) ⟩
+       ≡⟨ {!!} {- cong (λ xs → zip (mapList (λ xs → ((a * p') + q')) xs) (mapList (λ xs → p') xs)) (inits as) -} ⟩
       zip (mapList (λ xs → ((a * p') + q')) (inits as)) (mapList (λ xs → p') (inits as))
-      ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
+       ≡⟨ {!!} {- cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) -} ⟩
       zip (scan2l 1 ((a * p') + q') f as) (scan2l 1 p' f as)
-       ≡⟨ cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) ⟩
+       ≡⟨ {!!} {- cong (λ xs → zip (scan2l 1 ((a * p') + q') f xs) (scan2l 1 p' f xs)) (inits as) -} ⟩
       zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
-      ≡⟨ refl ⟩
+       ≡⟨ refl ⟩
       convergents' (a :: as)
+       ∎
 
+-- Example computation
 
+initsExmpl : inits (1 :: 2 :: 3 :: []) ≡ [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
+initsExmpl =
+  inits (1 :: 2 :: 3 :: [])
+    ≡⟨ refl
+       {- Def. inits, 2nd pattern -} ⟩
+  [] :: mapList (1 ::_) (inits (2 :: 3 :: []))
+    ≡⟨ cong (λ xxs → [] :: mapList (1 ::_) xxs) refl
+       {- Def. inits, 2nd pattern -} ⟩
+  [] :: mapList (1 ::_) ([] :: mapList (2 ::_) (inits (3 :: [])))
+    ≡⟨ cong ([] ::_) refl
+       {- Def. mapList (1 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: mapList (1 ::_) (mapList (2 ::_) (inits (3 :: [])))
+    ≡⟨ cong (λ xxs → [] :: (1 :: []) :: mapList (1 ::_) (mapList (2 ::_) xxs)) refl
+       {- Def. inits, 2nd pattern -} ⟩
+  [] :: (1 :: []) :: mapList (1 ::_) (mapList (2 ::_) ([] :: (mapList (3 ::_) (inits []))))
+    ≡⟨ cong (λ xxs → [] :: (1 :: []) :: mapList (1 ::_) xxs) refl
+       {- Def. mapList (2 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: mapList (1 ::_) ((2 :: []) :: mapList (2 ::_) ((mapList (3 ::_) (inits []))))
+    ≡⟨ cong (λ xxs → [] :: (1 :: []) :: xxs) refl
+       {- Def. mapList (1 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) (mapList (2 ::_) ((mapList (3 ::_) (inits []))))
+    ≡⟨ refl
+       {- Def. inits, 1st pattern ...
+          I leave out the cong stuff from here on, after all, by definition we have
+             cong f refl ≡ refl
+          for an arbitrary function f ! -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) (mapList (2 ::_) ((mapList (3 ::_) ([] :: []))))
+    ≡⟨ refl
+       {- Def. mapList (3 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) (mapList (2 ::_) ((3 :: []) :: (mapList (3 ::_) [])))
+    ≡⟨ refl
+       {- Def. mapList (3 ::_), 1st pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) (mapList (2 ::_) ((3 :: []) :: []))
+    ≡⟨ refl
+       {- Def. mapList (2 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) ((2 :: 3 :: []) :: mapList (2 ::_) [])
+    ≡⟨ refl
+       {- Def. mapList (2 ::_), 1st pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: mapList (1 ::_) ((2 :: 3 :: []) :: [])
+    ≡⟨ refl
+       {- Def. mapList (1 ::_), 2nd pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: mapList (1 ::_) []
+    ≡⟨ refl
+       {- Def. mapList (1 ::_), 1st pattern -} ⟩
+  [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
+    ∎
