@@ -107,7 +107,12 @@ x+0≡x : (x : ℕ) → x + 0 ≡ x
 x+0≡x zero = refl
 x+0≡x (succ x) = cong succ (x+0≡x x)
 
+x*1≡x : (x : ℕ) → x * 1 ≡ x
+x*1≡x zero = refl
+x*1≡x (succ x ) = {!cong succ (x*1≡x x) !}
 
+
+{-
 proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
@@ -131,7 +136,7 @@ proof (a :: as) =
        ≡⟨ refl ⟩
       convergents' (a :: as)
        ∎
-
+-}
 -- Example computation
 
 initsExmpl : inits (1 :: 2 :: 3 :: []) ≡ [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
