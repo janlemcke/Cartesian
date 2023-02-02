@@ -107,12 +107,25 @@ x+0≡x : (x : ℕ) → x + 0 ≡ x
 x+0≡x zero = refl
 x+0≡x (succ x) = cong succ (x+0≡x x)
 
+x+1≡sx : (x : ℕ) → x + 1 ≡ succ x
+x+1≡sx zero = refl
+x+1≡sx (succ x) = cong (succ) (x+1≡sx x)
+
 x*1≡x : (x : ℕ) → x * 1 ≡ x
 x*1≡x zero = refl
-x*1≡x (succ x ) = {!cong succ (x*1≡x x) !}
+x*1≡x (succ x) = 
+     ((x * 1) + 1)
+      ≡⟨ cong (λ a → (a + 1)) (x*1≡x x) ⟩
+     (x + 1)
+      ≡⟨ x+1≡sx x ⟩
+     succ x
+      ∎
 
 
 {-
+
+Idee: Elemtenweise Formulierung für den Beweis der Gleichheit.
+
 proof : (cf : ContFrac) → tail (convergents cf) ≡ convergents' cf
 proof [] = refl
 proof (a :: as) =
@@ -135,7 +148,7 @@ proof (a :: as) =
       zip (scan2l 0 1 f (a :: as)) (scan2l 1 0 f (a :: as))
        ≡⟨ refl ⟩
       convergents' (a :: as)
-       ∎
+      ∎
 -}
 -- Example computation
 
@@ -189,7 +202,7 @@ initsExmpl =
 -- towards computing toℚ [1,2,3]
 
 toℚLemma0 : toℚ [] ≡ < 1 , 0 >
-toℚLemma0 = {!!}
+toℚLemma0 = refl
 
 toℚLemma1 : (a₀ : ℕ) → toℚ ( a₀ :: []) ≡ < a₀ , 1 >
 toℚLemma1 a₀ =
@@ -202,6 +215,12 @@ toℚLemma1 a₀ =
   < ((a₀ * p') + q') , p' >
    ≡⟨ refl {- Def. let ... -} ⟩
   < ((a₀ * 1) + 0) , 1 >
-   ≡⟨ {!!} ⟩
+   ≡⟨ cong (λ x → < x , 1 > ) (x+0≡x (a₀ * 1)) ⟩
+  < (a₀ * 1) , 1 >
+   ≡⟨ cong (λ x → < x , 1 >) (x*1≡x a₀) ⟩
   < a₀ , 1 >
-   ∎
+  ∎
+
+toℚLemma2 : (a₀ a1 : ℕ) → toℚ ( a₀ :: a1 :: []) ≡ < (a₀ * a1) + 1 , a1 >
+toℚLemma2 a₀ a1 = {!!}
+
