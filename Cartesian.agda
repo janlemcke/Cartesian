@@ -199,6 +199,45 @@ initsExmpl =
   [] :: (1 :: []) :: (1 :: 2 :: []) :: (1 :: 2 :: 3 :: []) :: []
     ∎
 
+
+
+convExample : convergents' (1 :: 2 :: 3 :: []) ≡  < 1 , 1 > :: < 3 , 2 > :: < 10 , 7 > :: []
+convExample = 
+  convergents' (1 :: 2 :: 3 :: [])
+  ≡⟨ refl ⟩
+  zip (numerators (1 :: 2 :: 3 :: [])) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (scan2l 0 1 f (1 :: 2 :: 3 :: []) ) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Def. scan2l, 2nd pattern -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (f 0 1 1 :: scan2l 1 (f 0 1 1) f (2 :: 3 :: [])) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Def. scan2l, 2nd pattern -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (f 0 1 1 :: (f 1 (f 0 1 1) 2 :: scan2l (f 0 1 1) (f 1 (f 0 1 1) 2) f (3 :: []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Def. scan2l, 2nd pattern -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (f 0 1 1 :: (f 1 (f 0 1 1) 2 :: (f (f 0 1 1) (f 1 (f 0 1 1) 2) 3 :: scan2l (f 1 (f 0 1 1) 2) (f (f 0 1 1) (f 1 (f 0 1 1) 2) 3) f []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Def. scan2l, 1nd pattern -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (f 0 1 1 :: (f 1 (f 0 1 1) 2 :: (f (f 0 1 1) (f 1 (f 0 1 1) 2) 3 :: []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Computation -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (1 :: (f 1 1 2 :: (f 1 (f 1 1 2) 3 :: []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Computation -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (1 :: (3 :: (f 1 3 3 :: []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Computation -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (1 :: (3 :: (10 :: []))) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl {- Def _::_  -}  ⟩
+  let f = (\bn-2 -> \bn-1 -> \a -> (bn-1 * a) + bn-2 ) in 
+    zip (1 :: 3 :: 10 :: []) (denominators  (1 :: 2 :: 3 :: []))
+  ≡⟨ refl ⟩
+  < 1 , 1 > :: < 3 , 2 > :: < 10 , 7 > :: []
+  ∎
+
+
 -- towards computing toℚ [1,2,3]
 
 toℚLemma0 : toℚ [] ≡ < 1 , 0 >
