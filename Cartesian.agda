@@ -222,5 +222,13 @@ toℚLemma1 a₀ =
   ∎
 
 toℚLemma2 : (a₀ a1 : ℕ) → toℚ ( a₀ :: a1 :: []) ≡ < (a₀ * a1) + 1 , a1 >
-toℚLemma2 a₀ a1 = {!!}
+toℚLemma2 a₀ a1 = 
+  toℚ (a₀ :: a1 :: [])
+    ≡⟨ refl {- Def toℚ, 2nd pattern -} ⟩
+     let < p' , q' > = toℚ (a1 :: []) in
+    < ((a₀ * p') + q') , p' >
+    ≡⟨ cong (λ x → let < p' , q' > = x in < ((a₀ * p') + q') , p' > )  (toℚLemma1 a1) ⟩
+     < (a₀ * a1) + 1 , a1 >
+  ∎
+
 
