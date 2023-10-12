@@ -77,6 +77,12 @@ x*0≡0 (succ x) =
 +assoc zero y z = refl
 +assoc (succ x) y z = cong succ ( +assoc x y z )
 
++assoc' : (x y z : ℕ) → (x + y) + z ≡ x + (y + z)
++assoc' zero y z = refl
++assoc' (succ x) y z = cong succ (+assoc' x y z)
+
+
+
 +comm : (x y : ℕ) → x + y ≡ y + x
 +comm zero y = sym (x+0≡x y)
 +comm (succ x) y = 
@@ -147,6 +153,7 @@ x*0≡0 (succ x) =
   (x * y + y) * z
     ∎
 
+
 infix 3 _∘_
 
 _∘_ : {A B C : Set} → (B → C) → (A → B) → A → C
@@ -201,10 +208,34 @@ mutual
       a₂ = cf 2
     in
       a₀ * (a₁ * a₂ + 1) + a₂
-        ≡⟨ {!!} ⟩
-        -- ... some arithmetic to be filled in
+        ≡⟨ cong (λ xs → xs + a₂) (*comm (a₀) (a₁ * a₂ + 1)) ⟩
+       (a₁ * a₂ + 1) * a₀ + a₂
+        ≡⟨ cong (λ xs → xs + a₂) (*+dist' (a₀) (a₁ * a₂) 1) ⟩
+      (a₁ * a₂ * a₀ + 1 * a₀) + a₂
+        ≡⟨ cong (λ xs → (a₁ * a₂ * a₀ + xs) + a₂) (refl)   ⟩
+      (a₁ * a₂ * a₀ + a₀) + a₂
+        ≡⟨ refl ⟩
+      a₁ * a₂ * a₀ + a₀ + a₂
+        ≡⟨ +assoc' (a₁ * a₂ * a₀) (a₀) (a₂) ⟩
+      a₁ * a₂ * a₀ + (a₀ + a₂)
+        ≡⟨ cong (λ xs → a₁ * a₂ * a₀ + xs) (+comm a₀ a₂) ⟩
+      a₁ * a₂ * a₀ + (a₂ + a₀)
+        ≡⟨ +assoc (a₁ * a₂ * a₀) a₂ a₀ ⟩
+      a₁ * a₂ * a₀ + a₂ + a₀
+        ≡⟨ cong ( λ xs → a₁ * a₂ * a₀ + xs + a₀) refl ⟩
+      a₁ * a₂ * a₀ + 1 * a₂ + a₀
+        ≡⟨ cong (λ xs → xs * a₀ + 1 * a₂ + a₀) (*comm a₁ a₂) ⟩
+      a₂ * a₁ * a₀ + 1 * a₂ + a₀
+        ≡⟨ cong (λ xs → a₂ * a₁ * a₀ + xs + a₀) (*comm 1 a₂) ⟩ 
+      a₂ * a₁ * a₀ + a₂ * 1 + a₀
+        ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) (*assoc {!!} a₁ a₀) ⟩ 
+      a₂ * (a₁ * a₀) + a₂ * 1 + a₀
+        ≡⟨ cong (λ xs → xs + a₀) (*+dist {! a₂!} (a₁ * a₀) 1) ⟩
+      a₂ * ((a₁ * a₀) + 1) + a₀
+        ≡⟨ cong ((λ xs →  a₂ * (xs + 1) + a₀)) {!!} ⟩
       a₂ * (a₀ * a₁ + 1) + a₀
-        ∎
+      ∎
+      
   numsRec cf (succ m) =      -- n = succ (succ (succ m))
     let
       a₀ = cf 0
