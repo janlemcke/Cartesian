@@ -231,7 +231,7 @@ mutual
       a₂ * a₁ * a₀ + a₂ * 1 + a₀
         ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) {!!} ⟩ 
       a₂ * (a₁ * a₀) + a₂ * 1 + a₀
-        ≡⟨ cong (λ xs → xs + a₀) (*+dist {! a₂!} (a₁ * a₀) 1) ⟩
+        ≡⟨ *+dist a₂ (a₁ * a₀) 1 ⟩
       a₂ * ((a₁ * a₀) + 1) + a₀
         ≡⟨ cong ((λ xs →  a₂ * (xs + 1) + a₀)) (*comm (a₁) (a₀)) ⟩
       a₂ * ((a₀ * a₁) + 1) + a₀
