@@ -23,9 +23,13 @@ pred : ℕ -> ℕ
 pred zero = zero
 pred (succ n) = n
 
+infixr 20 _+_
+
 _+_ : ℕ -> ℕ -> ℕ
 zero + m = m
 succ m + n = succ (m + n)
+
+infixr 30 _*_
 
 _*_ : ℕ -> ℕ -> ℕ
 zero * m = zero
@@ -262,14 +266,14 @@ toℚLemma1 a₀ =
   < a₀ , 1 >
   ∎
 
-toℚLemma2 : (a₀ a1 : ℕ) → toℚ ( a₀ :: a1 :: []) ≡ < (a₀ * a1) + 1 , a1 >
-toℚLemma2 a₀ a1 =
-  toℚ (a₀ :: a1 :: [])
+toℚLemma2 : (a₀ a₁ : ℕ) → toℚ ( a₀ :: a₁ :: []) ≡ < (a₀ * a₁) + 1 , a₁ >
+toℚLemma2 a₀ a₁ =
+  toℚ (a₀ :: a₁ :: [])
     ≡⟨ refl {- Def toℚ, 2nd pattern -} ⟩
-     let < p' , q' > = toℚ (a1 :: []) in
+     let < p' , q' > = toℚ (a₁ :: []) in
     < ((a₀ * p') + q') , p' >
-    ≡⟨ cong (λ x → let < p' , q' > = x in < ((a₀ * p') + q') , p' > )  (toℚLemma1 a1) ⟩
-     < (a₀ * a1) + 1 , a1 >
+    ≡⟨ cong (λ x → let < p' , q' > = x in < ((a₀ * p') + q') , p' > )  (toℚLemma1 a₁) ⟩
+     < (a₀ * a₁) + 1 , a₁ >
   ∎
 
 
@@ -304,13 +308,124 @@ convergentsFun : ContFrac∞Fun → ℕ → ℚ
 convergentsFun cf n = toℚ (segmentFun n cf)
 
 numsFun denomsFun : ContFrac∞Fun → ℕ → ℕ
-numsFun cf n = fst (convergentsFun cf n)
+numsFun   cf n = fst (convergentsFun cf n)
 denomsFun cf n = snd (convergentsFun cf n)
 
-theorem1Nums : (cf : ContFrac∞Fun) → (n : ℕ) →
-               numsFun cf (n + 2) ≡ (cf (n + 2) * numsFun cf (n + 1)) + numsFun cf n
-theorem1Nums = {!!}
+cfTail : ContFrac∞Fun → ContFrac∞Fun
+cfTail cf = cf ∘ succ
 
-theorem1Denoms : (cf : ContFrac∞Fun) → (n : ℕ) →
-                 denomsFun cf (n + 2) ≡ (cf (n + 2) * denomsFun cf (n + 1)) + denomsFun cf n
-theorem1Denoms = {!!}
+segmentFunLemma : (cf : ContFrac∞Fun) → (n : ℕ) → segmentFun (1 + n) cf ≡ cf 0 :: segmentFun n (cfTail cf)
+segmentFunLemma cf zero     = refl
+segmentFunLemma cf (succ n) = cong (cf 0 ::_) (segmentFunLemma (cfTail cf) n)
+
+
+numsFunLemma : (cf : ContFrac∞Fun) → (n : ℕ) →
+               numsFun cf (1 + n) ≡ cf 0  * numsFun (cfTail cf) n  + denomsFun (cfTail cf) n
+numsFunLemma cf n = 
+   numsFun cf (1 + n)
+     ≡⟨⟩
+   fst (toℚ (segmentFun (1 + n) cf))
+     ≡⟨ cong (fst ∘ toℚ) (segmentFunLemma cf n) ⟩
+   fst (toℚ (cf 0 :: segmentFun n (cfTail cf)))
+     ≡⟨⟩ -- by definition of toℚ
+   cf 0 * numsFun (cfTail cf) n + denomsFun (cfTail cf) n
+     ∎
+
+denomsFunLemma : (cf : ContFrac∞Fun) → (n : ℕ) →
+                 denomsFun cf (1 + n) ≡ numsFun (cfTail cf) n
+denomsFunLemma cf n = 
+   denomsFun cf (1 + n)
+     ≡⟨⟩ -- by definitions denomsFun and convergentsFun
+   snd (toℚ (segmentFun (1 + n) cf))
+     ≡⟨ cong (snd ∘ toℚ) (segmentFunLemma cf n) ⟩
+   snd (toℚ (cf 0 :: segmentFun n (cfTail cf)))
+     ≡⟨⟩ -- by definition of toℚ
+   numsFun (cfTail cf) n
+     ∎
+
+numsFun0Lemma : (cf : ContFrac∞Fun) → numsFun cf 0 ≡ cf 0
+numsFun0Lemma cf = 
+  numsFun cf 0
+    ≡⟨⟩
+  fst (toℚ (segmentFun 0 cf))
+    ≡⟨ cong fst (toℚLemma1 (cf 0)) ⟩
+  cf 0
+    ∎
+
+denomsFun0Lemma : (cf : ContFrac∞Fun) → denomsFun cf 0 ≡ 1
+denomsFun0Lemma cf =
+  denomsFun cf 0
+    ≡⟨⟩
+  1
+    ∎
+
+numsFun1Lemma : (cf : ContFrac∞Fun) → numsFun cf 1 ≡ cf 0 * cf 1 + 1
+numsFun1Lemma cf =
+  numsFun cf 1
+    ≡⟨⟩
+  fst (toℚ (segmentFun 1 cf))
+    ≡⟨ cong fst (toℚLemma2 (cf 0) (cf 1)) ⟩
+  cf 0 * cf 1 + 1
+    ∎
+
+denomsFun1Lemma : (cf : ContFrac∞Fun) → denomsFun cf 1 ≡ cf 1
+denomsFun1Lemma cf =
+  denomsFun cf 1
+    ≡⟨⟩
+  snd (toℚ (segmentFun 1 cf))
+    ≡⟨ cong snd (toℚLemma2 (cf 0) (cf 1)) ⟩
+  cf 1
+    ∎
+
+mutual     -- we need mutual since we call theorem1Denoms in theorem1Nums and vice versa
+  theorem1Nums : (cf : ContFrac∞Fun) → (n : ℕ) →
+                 numsFun cf (2 + n) ≡ cf (2 + n) * numsFun cf (1 + n) + numsFun cf n
+  theorem1Nums cf zero     = 
+    let
+      cf'  = cfTail cf
+      cf'' = cfTail cf'
+    in
+      numsFun cf 2
+        ≡⟨ numsFunLemma cf 1 ⟩
+      cf 0 * numsFun cf' 1 + denomsFun cf' 1
+        ≡⟨ cong (λ x → cf 0 * x + denomsFun cf' 1) (numsFun1Lemma cf') ⟩
+      cf 0 * (cf' 0 * cf' 1 + 1) + denomsFun cf' 1
+        ≡⟨ cong (λ x → cf 0 * (cf' 0 * cf' 1 + 1) + x) (denomsFun1Lemma cf') ⟩
+      cf 0 * (cf' 0 * cf' 1 + 1) + cf' 1
+        ≡⟨⟩  -- definition cfTail 
+      cf 0 * (cf 1 * cf 2 + 1) + cf 2
+        ≡⟨ {!!} ⟩   -- rest is arithmetic
+      cf 2 * (cf 0 * cf 1 + 1)  +  cf 0
+        ≡⟨ cong (λ x → cf 2 * x + cf 0) (sym (numsFun1Lemma cf)) ⟩
+      cf 2 * numsFun cf 1  +  cf 0
+        ≡⟨ cong (λ x → cf 2 * numsFun cf 1 + x) (sym (numsFun0Lemma cf)) ⟩
+      cf 2 * numsFun cf 1  +  numsFun cf 0
+        ∎
+  
+  theorem1Nums cf (succ n) =
+    let
+      cf'  = cfTail cf
+      cf'' = cfTail cf'
+    in
+      numsFun cf (3 + n)
+        ≡⟨ numsFunLemma cf (2 + n) ⟩
+      cf 0  * numsFun cf' (2 + n) + denomsFun cf' (2 + n)
+        ≡⟨ cong (λ x → cf 0 * x + denomsFun cf' (2 + n)) (theorem1Nums cf' n) ⟩
+      cf 0  * (cf' (2 + n) * numsFun cf' (1 + n) + numsFun cf' n) + denomsFun cf' (2 + n)
+        ≡⟨⟩ -- by def. on cfTail
+      cf 0  * (cf (3 + n) * numsFun cf' (1 + n) + numsFun cf' n) + denomsFun cf' (2 + n)
+        ≡⟨ cong (λ x → cf 0 * (cf (3 + n) * numsFun cf' (1 + n) + numsFun cf' n) + x) (theorem1Denoms cf' n) ⟩
+      cf 0  * (cf (3 + n) * numsFun cf' (1 + n) + numsFun cf' n) + (cf' (2 + n) * denomsFun cf' (1 + n)) + denomsFun cf' n
+        ≡⟨⟩
+      cf 0  * (cf (3 + n) * numsFun cf' (1 + n) + numsFun cf' n) + (cf (3 + n) * denomsFun cf' (1 + n)) + denomsFun cf' n
+        ≡⟨ {!!} ⟩  -- rest is arithmetic
+      cf (3 + n) * (cf 0  * numsFun cf' (1 + n) + denomsFun cf' (1 + n)) + cf 0 * numsFun cf' n + denomsFun cf' n  
+        ≡⟨ sym (cong (λ x → cf (3 + n) * x + numsFun cf (1 + n)) (numsFunLemma cf (1 + n))) ⟩ 
+      cf (3 + n) * (cf 0  * numsFun cf' (1 + n) + denomsFun cf' (1 + n)) + numsFun cf (1 + n)  
+        ≡⟨ sym (cong (λ x → cf (3 + n) * x + numsFun cf (1 + n)) (numsFunLemma cf (1 + n))) ⟩ 
+      cf (3 + n) * numsFun cf (2 + n) + numsFun cf (1 + n)
+        ∎
+  
+  theorem1Denoms : (cf : ContFrac∞Fun) → (n : ℕ) →
+                   denomsFun cf (2 + n) ≡ (cf (2 + n) * denomsFun cf (1 + n)) + denomsFun cf n
+  theorem1Denoms = {!!} -- analogous
