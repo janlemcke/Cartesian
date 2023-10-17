@@ -229,7 +229,7 @@ mutual
       a₂ * a₁ * a₀ + 1 * a₂ + a₀
         ≡⟨ cong (λ xs → a₂ * a₁ * a₀ + xs + a₀) (*comm 1 a₂) ⟩ 
       a₂ * a₁ * a₀ + a₂ * 1 + a₀
-        ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) (sym (*assoc _ _ _)) ⟩ 
+        ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) (sym (*assoc a₂ a₁ a₀)) ⟩ 
       a₂ * (a₁ * a₀) + a₂ * 1 + a₀
         ≡⟨ cong (_+ a₀) (sym (*+dist a₂ (a₁ * a₀) 1)) {- *+dist a₂ (a₁ * a₀) 1 -}⟩
       a₂ * ((a₁ * a₀) + 1) + a₀
