@@ -3,18 +3,42 @@
 module Cartesian2 where
 
 
-{--  new attempt
+{--
 
-1. from the start, use infinite continued fractions, encoded as
-   functions ℕ → ℕ
+The goal is to prove the recursion formulas for the numerators and
+denominators of the convergents of (infinite, regular) continued
+fractions (see Theorem 1 in Khinchin's "Continued fractions", p.4).
 
-2. instead of defining convergents, just define the sequences of numerators
-   and denominators by mutual recursion  (nums dens)
+To focus on the essential idea of the proof, we choose to encode
+infinite continued fractions as functions ℕ → ℕ. I.e. the continued
+fraction [a₀; a₁, a₂, ...] will be represented by the function
+λ n → aₙ. This simplifies our implementation, but is also incorrect
+in two ways, which however, for different reasons, are not essential
+to the idea of Khinchin's proof:
 
-3. prove the recursion formulas for numerators and denominators by
-   mutual induction, close to Khinchin
+1. While normally, in a regular infinite continued fraction, a₀ is
+allowed to be an arbitrary real number, we require a₀ to be a natural
+number. For the recursion formulas, this is not essential (a₀ could
+be made a formal parameter everywhere) but it would have required
+case splits in many places, which seems overkill.
 
--}
+2. On the other hand, aᵢ for i > 0 are normally required to be
+positive, otherwise in the usual definition of convergents (as the
+expansion of the finite continued fractions obtained by truncating
+the given infinite one) one would have to divide by 0. We instead
+start by a corecursive definition of the numerators and denominators
+of convergents (compare nums and dens below and Khinchin's formula (6)
+on page 4. Here no divisions occur, so the sequences of nums and dens
+are well defined for any function ℕ → ℕ. In the case where aᵢ > 0 for
+all i > 0, it is clear that these are indeed the sequences of
+numerators and denominators of the convergents (but we don't prove
+this here).
+
+We can then prove the recursion formulas for numerators and
+denominators by mutual induction, close to Khinchin's proof (see
+numsRec, densRec below).
+
+--}
 
 open import Relation.Binary.PropositionalEquality
 open ≡-Reasoning
