@@ -89,7 +89,7 @@ x*1≡x (succ x) =
 
 x*0≡0 : (x : ℕ) → x * 0 ≡ 0
 x*0≡0 zero = refl
-x*0≡0 (succ x) = 
+x*0≡0 (succ x) =
   (x * 0) + 0
     ≡⟨ cong (λ y → y + 0) (x*0≡0 x) ⟩
   0 + 0
@@ -109,7 +109,7 @@ x*0≡0 (succ x) =
 
 +comm : (x y : ℕ) → x + y ≡ y + x
 +comm zero y = sym (x+0≡x y)
-+comm (succ x) y = 
++comm (succ x) y =
   succ (x + y)
     ≡⟨ cong succ (+comm x y) ⟩
   succ (y + x)
@@ -123,7 +123,7 @@ x*0≡0 (succ x) =
 
 *+dist : (x y z : ℕ) → x * (y + z) ≡ x * y + x * z
 *+dist zero y z = refl
-*+dist (succ x) y z = 
+*+dist (succ x) y z =
   x * (y + z) + (y + z)
     ≡⟨ cong (λ w → w + (y + z)) (*+dist x y z) ⟩
   x * y + x * z + (y + z)
@@ -142,7 +142,7 @@ x*0≡0 (succ x) =
 
 *comm : (x y : ℕ) → x * y ≡ y * x
 *comm zero y = sym (x*0≡0 y)
-*comm (succ x) y = 
+*comm (succ x) y =
   x * y + y
     ≡⟨ cong (_+ y) (*comm x y) ⟩
   y * x + y
@@ -166,10 +166,10 @@ x*0≡0 (succ x) =
     ≡⟨ cong (y * x +_) (*comm x z) ⟩
   y * x + z * x
     ∎
-    
+
 *assoc : (x y z : ℕ) → x * (y * z) ≡ x * y * z
 *assoc zero y z = refl
-*assoc (succ x) y z = 
+*assoc (succ x) y z =
   x * (y * z) + y * z
     ≡⟨ cong (_+ y * z) (*assoc x y z) ⟩
   x * y * z + y * z
@@ -182,7 +182,7 @@ x*0≡0 (succ x) =
 infix 3 _∘_
 
 _∘_ : {A B C : Set} → (B → C) → (A → B) → A → C
-(f ∘ g) a = f (g a) 
+(f ∘ g) a = f (g a)
 
 
 CF : Set
@@ -191,7 +191,7 @@ CF = ℕ → ℕ
 mutual
   nums dens : CF → ℕ → ℕ
   nums cf zero = cf 0
-  nums cf (succ n) = 
+  nums cf (succ n) =
     let
       a₀ = cf 0
       tail = cf ∘ succ
@@ -200,7 +200,7 @@ mutual
     in
       a₀ * p' + q'
   dens cf zero = 1
-  dens cf (succ n) = 
+  dens cf (succ n) =
     let
       tail = cf ∘ succ
       p' = nums tail n
@@ -226,7 +226,7 @@ showfirst f (succ n) = f zero :: showfirst (f ∘ succ) n
 mutual
   numsRec : ∀ cf n →
             nums cf (succ (succ n)) ≡ cf (succ (succ n)) * nums cf (succ n) + nums cf n
-  numsRec cf zero = 
+  numsRec cf zero =
     let
       a₀ = cf 0
       a₁ = cf 1
@@ -251,9 +251,9 @@ mutual
       a₁ * a₂ * a₀ + 1 * a₂ + a₀
         ≡⟨ cong (λ xs → xs * a₀ + 1 * a₂ + a₀) (*comm a₁ a₂) ⟩
       a₂ * a₁ * a₀ + 1 * a₂ + a₀
-        ≡⟨ cong (λ xs → a₂ * a₁ * a₀ + xs + a₀) (*comm 1 a₂) ⟩ 
+        ≡⟨ cong (λ xs → a₂ * a₁ * a₀ + xs + a₀) (*comm 1 a₂) ⟩
       a₂ * a₁ * a₀ + a₂ * 1 + a₀
-        ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) (sym (*assoc a₂ a₁ a₀)) ⟩ 
+        ≡⟨ cong (λ xs → xs + a₂ * 1 + a₀) (sym (*assoc a₂ a₁ a₀)) ⟩
       a₂ * (a₁ * a₀) + a₂ * 1 + a₀
         ≡⟨ cong (_+ a₀) (sym (*+dist a₂ (a₁ * a₀) 1)) {- *+dist a₂ (a₁ * a₀) 1 -}⟩
       a₂ * ((a₁ * a₀) + 1) + a₀
@@ -262,7 +262,7 @@ mutual
        ≡⟨ refl ⟩
       a₂ * (a₀ * a₁ + 1) + a₀
       ∎
-      
+
   numsRec cf (succ m) =      -- n = succ (succ (succ m))
     let
       a₀ = cf 0
@@ -322,7 +322,7 @@ mutual
 
   densRec : ∀ cf n →
             dens cf (succ (succ n)) ≡ cf (succ (succ n)) * dens cf (succ n) + dens cf n
-  densRec cf zero = 
+  densRec cf zero =
     let
       a₁ = cf 1
       a₂ = cf 2
@@ -330,8 +330,8 @@ mutual
       a₁ * a₂ + 1
         ≡⟨ cong (λ x → x + 1) (*comm a₁ a₂) ⟩
       a₂ * a₁ + 1
-        ∎ 
-  densRec cf (succ m) = 
+        ∎
+  densRec cf (succ m) =
     let
       aₙ = cf (succ (succ (succ m)))
       qₙ = dens cf (succ (succ (succ m)))
